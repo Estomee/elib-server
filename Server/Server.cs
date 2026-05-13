@@ -7,8 +7,17 @@ namespace Server
     {
         public static void Main(string[] args)
         {
-            var app = Config.Configure(args);
-            app.Run();
+            try
+            {
+                var app = Config.Configure(args);
+                app.Run();
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine("=== FATAL STARTUP ERROR ===");
+                Console.Error.WriteLine(ex.ToString());
+                Environment.Exit(1);
+            }
         }
     }
 }

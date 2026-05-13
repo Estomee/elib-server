@@ -37,29 +37,19 @@ namespace Server.Configuration
             var yandexSection = builder.Configuration.GetSection("ConnectionStrings:YandexCloud");
             builder.Services.Configure<YandexStorageOptions>(yandexSection);
 
-            var s3Endpoint = yandexSection["Endpoint"]
-                ?? Environment.GetEnvironmentVariable("ConnectionStrings__YandexCloud__Endpoint")
-                ?? "https://storage.yandexcloud.net";
-            var s3Region = yandexSection["Region"]
-                ?? Environment.GetEnvironmentVariable("ConnectionStrings__YandexCloud__Region")
-                ?? "ru-central1-a";
-            var s3KeyId = yandexSection["KeyIdentifier"]
-                ?? Environment.GetEnvironmentVariable("ConnectionStrings__YandexCloud__KeyIdentifier")
-                ?? throw new InvalidOperationException("YandexCloud KeyIdentifier is not configured.");
-            var s3Secret = yandexSection["SecretKey"]
-                ?? Environment.GetEnvironmentVariable("ConnectionStrings__YandexCloud__SecretKey")
-                ?? throw new InvalidOperationException("YandexCloud SecretKey is not configured.");
-
-            Console.WriteLine($"[Config] S3 Endpoint: {s3Endpoint}");
-            Console.WriteLine($"[Config] S3 Region:   {s3Region}");
-            Console.WriteLine($"[Config] S3 KeyId:    {(string.IsNullOrEmpty(s3KeyId) ? "EMPTY" : "SET")}");
+            var s3KeyId = yandexSection["KeyIdentifier"];
+            var s3Secret = yandexSection["SecretKey"];
+            if (string.IsNullOrEmpty(s3KeyId))
+                throw new InvalidOperationException("YandexCloud:KeyIdentifier is not configured.");
+            if (string.IsNullOrEmpty(s3Secret))
+                throw new InvalidOperationException("YandexCloud:SecretKey is not configured.");
 
             var credentials = new BasicAWSCredentials(s3KeyId, s3Secret);
             var s3Config = new AmazonS3Config
             {
-                ServiceURL           = s3Endpoint,
+                ServiceURL           = yandexSection["Endpoint"],
                 ForcePathStyle       = true,
-                AuthenticationRegion = s3Region
+                AuthenticationRegion = yandexSection["Region"]
             };
             builder.Services.AddSingleton<IAmazonS3>(new AmazonS3Client(credentials, s3Config));
             builder.Services.AddScoped<IStorageService, YandexStorageService>();

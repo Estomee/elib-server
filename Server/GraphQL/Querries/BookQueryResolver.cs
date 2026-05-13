@@ -1,5 +1,6 @@
 // GraphQL query resolver for fetching individual books and generating presigned cover/content URLs.
 using HotChocolate;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Server.Data;
 using Server.GraphQL.Types;
@@ -45,15 +46,21 @@ public class BookQueryResolver
     public async Task<string?> GetBookFileUrl(
         int bookId,
         [Service] ElibDbContext db,
-        [Service] IStorageService storage,
+        [Service] IHttpContextAccessor httpContext,
         CancellationToken cancellationToken)
     {
         var file = await db.MediaFiles
             .FirstOrDefaultAsync(m => m.EntityId == bookId && m.FileType == "content", cancellationToken);
         if (file == null) return null;
 
-        try { return await storage.GetFile(file.StorageKey); }
-        catch { return null; }
+        var req = httpContext.HttpContext?.Request;
+        if (req == null) return null;
+
+        var ext = System.IO.Path.GetExtension(file.StorageKey).TrimStart('.').ToLowerInvariant();
+        if (string.IsNullOrEmpty(ext)) ext = "pdf";
+
+        // Return a server-proxied URL so the client never contacts Yandex Cloud directly.
+        return $"{req.Scheme}://{req.Host}/api/books/{bookId}/content?type={ext}";
     }
 
     [GraphQLName("book_cover_url")]

@@ -3,6 +3,7 @@ using System.Text;
 using Amazon;
 using Amazon.Runtime;
 using Amazon.S3;
+using Amazon.S3.Model;
 using Microsoft.Extensions.Options;
 using HotChocolate.Types.Descriptors;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -144,6 +145,40 @@ namespace Server.Configuration
             app.UseAuthentication();
             app.UseAuthorization();
             app.MapGraphQL();
+
+            // Proxy book file content through the server so clients never need direct Yandex Cloud access.
+            app.MapGet("/api/books/{bookId}/content", async (
+                int bookId,
+                IDbContextFactory<ElibDbContext> dbFactory,
+                IAmazonS3 s3,
+                IOptions<YandexStorageOptions> opts,
+                CancellationToken cancellationToken) =>
+            {
+                await using var db = await dbFactory.CreateDbContextAsync(cancellationToken);
+                var file = await db.MediaFiles
+                    .FirstOrDefaultAsync(m => m.EntityId == bookId && m.FileType == "content", cancellationToken);
+                if (file == null) return Results.NotFound();
+
+                try
+                {
+                    var s3Request = new GetObjectRequest
+                    {
+                        BucketName = opts.Value.Buckets.MainBucket,
+                        Key        = file.StorageKey
+                    };
+                    var s3Response = await s3.GetObjectAsync(s3Request, cancellationToken);
+
+                    var contentType = file.StorageKey.EndsWith(".epub", StringComparison.OrdinalIgnoreCase)
+                        ? "application/epub+zip"
+                        : "application/pdf";
+
+                    return Results.Stream(s3Response.ResponseStream, contentType);
+                }
+                catch
+                {
+                    return Results.Problem("Не удалось получить файл из хранилища.");
+                }
+            }).RequireAuthorization();
 
             app.MapGet("/health", async (
                 IDbContextFactory<ElibDbContext> dbFactory,

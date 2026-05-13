@@ -1,0 +1,54 @@
+# =============================================================================
+# INPUT ТИПЫ для запросов
+# =============================================================================
+
+input BookPagination {
+    first: Int!
+    last: Int!
+    after: String!
+    before: String!
+}
+
+input BookFilter {
+    title: String
+    author: String
+    genre: String
+    type_of_work: String
+    year_of_publishing: Int
+}
+
+input UserPagination {
+    first: Int!
+    after: String!
+}
+
+input UserFilter {
+    email: String
+    first_name: String
+    last_name: String
+}
+
+input EmployeePagination {
+    first: Int!
+    last: Int!
+    after: String!
+    before: String!
+}
+
+input EmployeeFilter {
+    full_name: String   # поиск по ФИО
+    email: String
+    position_id: ID
+}
+
+input LogPagination {
+    first: Int!
+    after: String!
+    last: Int!
+    before: String!
+}
+
+input LogFilter {
+    user_email: String
+    log_level: String   # значение levelName из таблицы LEVEL_OF_LOGS
+}

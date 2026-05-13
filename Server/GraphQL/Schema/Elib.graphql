@@ -1,0 +1,306 @@
+scalar DateTime
+scalar Date
+
+# -----------------------------------------------------------------------------
+# Пагинация логов
+# -----------------------------------------------------------------------------
+type LogsConnection {
+  edges: [LogEdge!]!
+  totalCount: Int!
+  pageInfo: LogPageInfo!
+  pageSize: Int!
+}   
+
+type LogEdge {
+  cursor: String!
+  node: SystemLog!
+}
+
+type LogPageInfo {
+  startCursor: String
+  endCursor: String
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+}
+# -----------------------------------------------------------------------------
+# Пагинация пользователей
+# -----------------------------------------------------------------------------
+
+type UsersConnection {
+  edges: [UserEdge!]!
+  totalCount: Int!
+  pageInfo: UserPageInfo!
+  pageSize: Int!
+}
+
+type UserEdge {
+  cursor: String!
+  node: User!
+}
+
+type UserPageInfo {
+  startCursor: String
+  endCursor: String
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+}
+# -----------------------------------------------------------------------------
+# Пагинация книг
+# -----------------------------------------------------------------------------
+type BooksConnection {
+  edges: [BookEdge!]!
+  totalCount: Int!
+  pageInfo: BookPageInfo!
+  pageSize: Int!
+}
+
+type BookEdge {
+  cursor: String!
+  node: Book!
+}
+
+type BookPageInfo {
+  startCursor: String
+  endCursor: String
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+}
+
+type UserBooksConnection {
+  edges: [UserBookEdge!]!
+  totalCount: Int!
+  pageInfo: UserBookPageInfo!
+  pageSize: Int!
+}
+
+type UserBookEdge {
+  cursor: String!
+  node: UserBook!
+}
+
+type UserBookPageInfo {
+  startCursor: String
+  endCursor: String
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+}
+# -----------------------------------------------------------------------------
+# Пользователи и сессии
+# -----------------------------------------------------------------------------
+
+type User {
+  user_id: ID!
+  username: String!
+  email: String!
+  first_name: String!
+  last_name: String!
+  middle_name: String
+  phone: String!
+  year_of_birth: Int!
+  employee: Boolean!
+  registration_date: DateTime!
+  last_login: DateTime!
+  last_password_change: DateTime!
+  sessions: [UserSession!]!
+}
+
+type UserSession {
+  session_id: ID!
+  user: User!
+  created_at: DateTime
+  expires_at: DateTime!
+  device_info: DeviceInfo!
+  ip_address: String!
+}
+
+type DeviceInfo {
+  device_id: ID!
+  device_type: String!
+  os: String!
+}
+# -----------------------------------------------------------------------------
+# Книги, авторы, жанры, справочники
+# -----------------------------------------------------------------------------
+
+type Author {
+  author_id: ID!
+  first_name: String!
+  last_name: String!
+  year_of_birth: Int!
+}
+
+type Genre {
+  genre_id: ID!
+  genre_name: String!
+  parent_genre_id: Int
+}
+
+type Language {
+  lang_id: ID!
+  lang_code: String!
+  lang_name: String!
+}
+
+type TypeOfWork {
+  work_id: ID!
+  type_name: String!
+}
+
+type Publisher {
+  publisher_id: ID!
+  name: String!
+}
+
+# Интерфейс — контракт для Book и UserBook
+interface IBook {
+  book_id: ID!
+  isbn: String!
+  title: String!
+  description: String!
+  year_of_publishing: Int!
+  page_count: Int!
+  edition_number: Int!
+  created_at: DateTime!
+  updated_at: DateTime!
+  publisher: Publisher!
+  book_cover: MediaFile
+  book_file: [MediaFile!]!
+  type_of_work: TypeOfWork!
+  language: Language!
+  authors: [Author!]!
+  genres: [Genre!]!
+}
+
+type Book implements IBook {
+  book_id: ID!
+  isbn: String!
+  title: String!
+  description: String!
+  year_of_publishing: Int!
+  page_count: Int!
+  edition_number: Int!
+  created_at: DateTime!
+  updated_at: DateTime!
+  publisher: Publisher!
+  book_cover: MediaFile
+  book_file: [MediaFile!]!
+  type_of_work: TypeOfWork!
+  language: Language!
+  authors: [Author!]!
+  genres: [Genre!]!
+}
+
+enum UserBookStatus {
+  READING
+  FINISHED
+}
+
+type UserBook implements IBook {
+  book_id: ID!
+  isbn: String!
+  title: String!
+  description: String!
+  year_of_publishing: Int!
+  page_count: Int!
+  edition_number: Int!
+  created_at: DateTime!
+  updated_at: DateTime!
+  publisher: Publisher!
+  book_cover: MediaFile
+  book_file: [MediaFile!]!
+  type_of_work: TypeOfWork!
+  language: Language!
+  authors: [Author!]!
+  genres: [Genre!]!
+  user: User!
+  status: UserBookStatus!
+  added_date: DateTime!
+  started_reading: DateTime!
+  finished_reading: DateTime
+  last_read_page: Int!
+}
+
+type MediaFile {
+  media_id: ID!
+  entity_type: String!
+  file_type: String!
+  file_name: String!
+  file_path: String!
+  file_size: Int!
+  mime_type: String!
+  storage_type: String!
+  storage_key: String!
+  width: Int!
+  height: Int!
+  is_public: Boolean!
+  uploaded_by: Int!
+  uploaded_at: DateTime!
+}
+
+# -----------------------------------------------------------------------------
+# Сотрудники и должности
+# -----------------------------------------------------------------------------
+
+type Position {
+  position_id: Int!
+  title: String!
+  salary: Float!
+  permissions: Permission!
+}
+
+type WorkSchedule {
+  schedule_id: ID!
+  work_days: Int!
+  holidays: Int!
+  shift_start: Date!
+  shift_end: Date!
+}
+
+type Permission {
+  to_read: Boolean!
+  to_write: Boolean!
+  to_delete: Boolean!
+  to_update: Boolean!
+}
+type Employee {
+  employee_id: Int!
+  user: User!
+  position: Position!
+  hire_date: Date!
+  termination_date: Date!
+  passport_number: String!
+  passport_series: String!
+  work_schedule: WorkSchedule!
+}
+
+# -----------------------------------------------------------------------------
+# Уведомления и логи
+# -----------------------------------------------------------------------------
+
+type Notification {
+  notification_id: ID!
+  user_id: User!
+  subject: String!
+  content: String!
+  status: String!
+  sent_via: String!
+  sent_at: DateTime!
+  read_at: DateTime!
+}
+
+type LevelOfLog {
+  level_id: ID!
+  level_name: String!
+  color: String!
+}
+
+type SystemLog {
+  log_id: ID!
+  timestamp: DateTime!
+  level: LevelOfLog!
+  user_id: Int!
+  action: String!
+  ip_address: String!
+}
+
+

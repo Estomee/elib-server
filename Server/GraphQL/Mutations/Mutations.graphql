@@ -1,0 +1,134 @@
+# =============================================================================
+# СХЕМА МУТАЦИЙ
+# =============================================================================
+
+type Mutation {
+
+    # -------------------------------------------------------------------------
+    # Авторизация
+    # -------------------------------------------------------------------------
+
+    login(email: String!, password: String!): AuthPayload!
+    logout: Boolean!
+
+    # Добавлен: регистрация нового пользователя (нет в исходнике, но необходима
+    # для WelcomePage / RegisterPage)
+    register(
+        email: String!
+        password: String!
+        first_name: String!
+        last_name: String!
+        middle_name: String
+        phone: STring!
+        year_of_birth: Int!
+    ): AuthPayload!
+
+    # Сброс пароля через email
+    request_password_reset(email: String!): Boolean!
+    reset_password(email: String!, code: String!, new_password: String!): Boolean!
+
+    # -------------------------------------------------------------------------
+    # Профиль текущего пользователя
+    # -------------------------------------------------------------------------
+
+    update_profile_data(
+        first_name: String
+        last_name: String
+        middle_name: String
+        phone: String
+        year_of_birth: Int
+    ): Boolean!
+
+    change_password(new_password: String!, repeat_new_password: String!): Boolean!
+
+    # -------------------------------------------------------------------------
+    # Книги (администратор)
+    # -------------------------------------------------------------------------
+
+    # Загрузка новой книги — UploadBooksView
+    upload_book_to_library(book: BookInput!, media: MediaFileInput!): Book!
+
+    # Обновление метаданных книги — ManageBooksView
+    update_book_details(book_id: ID!, book: BookInputForUpdate!, media: MediaFileInput): Boolean!
+
+    # Удаление книги из каталога — ManageBooksView
+    delete_book(book_id: ID!): Boolean!
+
+    # -------------------------------------------------------------------------
+    # Библиотека пользователя
+    # -------------------------------------------------------------------------
+
+    add_book_to_user_library(book_to_add: WorkWithBookInput!): Book!
+    delete_book_from_library(book_to_delete: BookToRemove!): Boolean!
+
+    # Обновление прогресса чтения (текущая страница) — ReaderPage
+    # Исправлен: убрано поле author из UpdateUserBookInput (было избыточным)
+    update_reading_process(progress_update: UpdateUserBookInput!): Boolean!
+
+    # -------------------------------------------------------------------------
+    # Управление пользователями (администратор) — ManageUsersView
+    # -------------------------------------------------------------------------
+
+    # Редактирование данных пользователя (имя, email, телефон, пароль)
+    update_user_information(user_id: ID!, information: UserInput!): Boolean!
+
+    # Удаление пользователя
+    # Добавлен: ManageUsersView имеет кнопку удаления пользователя
+    delete_user(user_id: ID!): Boolean!
+
+    # -------------------------------------------------------------------------
+    # Управление сотрудниками (администратор) — ManageEmployeesView
+    # Добавлен полный CRUD: в UI есть форма добавления/редактирования/удаления
+    # -------------------------------------------------------------------------
+
+    add_employee(input: EmployeeInput!): Employee!
+    update_employee(employee_id: ID!, input: EmployeeInput!): Employee!
+    delete_employee(employee_id: ID!): Boolean!
+
+    # -------------------------------------------------------------------------
+    # Справочники: авторы
+    # Добавлен: хотя авторы создаются через newAuthors в BookInput,
+    # отдельная мутация нужна для управления авторами без привязки к книге
+    # -------------------------------------------------------------------------
+
+    add_author(input: AuthorInput!): Author!
+    update_author(author_id: ID!, input: AuthorInput!): Author!
+    delete_author(author_id: ID!): Boolean!
+
+    # -------------------------------------------------------------------------
+    # Справочники: языки — ManageReferenceView (если добавить вкладку) /
+    # создаётся инлайн через langChip.isNew в UploadBooksView
+    # Добавлен: SingleChipSelector позволяет создавать новый язык
+    # -------------------------------------------------------------------------
+
+    add_language(input: LanguageInput!): Language!
+    update_language(language_id: ID!, input: LanguageInput!): Language!
+    delete_language(language_id: ID!): Boolean!
+
+    # -------------------------------------------------------------------------
+    # Справочники: типы произведений — аналогично языкам
+    # Добавлен: SingleChipSelector typeChip позволяет создавать новый тип
+    # -------------------------------------------------------------------------
+
+    add_type_of_work(input: TypeOfWorkInput!): TypeOfWork!
+    update_type_of_work(type_id: ID!, input: TypeOfWorkInput!): TypeOfWork!
+    delete_type_of_work(type_id: ID!): Boolean!
+
+    # -------------------------------------------------------------------------
+    # Справочники: уровни логов — ManageReferenceView вкладка «Уровни логов»
+    # Добавлен: в UI есть полный CRUD с пикером цвета
+    # -------------------------------------------------------------------------
+
+    add_log_level(input: LogLevelInput!): LogLevel!
+    update_log_level(level_id: ID!, input: LogLevelInput!): LogLevel!
+    delete_log_level(level_id: ID!): Boolean!
+
+    # -------------------------------------------------------------------------
+    # Справочники: должности — ManageReferenceView вкладка «Должности»
+    # Добавлен: в UI есть полный CRUD с полями оклада и прав доступа
+    # -------------------------------------------------------------------------
+
+    add_position(input: PositionInput!): Position!
+    update_position(position_id: ID!, input: PositionInput!): Position!
+    delete_position(position_id: ID!): Boolean!
+}

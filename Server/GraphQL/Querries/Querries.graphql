@@ -1,0 +1,77 @@
+# =============================================================================
+# СХЕМА ЗАПРОСОВ
+# =============================================================================
+
+type Query {
+
+    # -------------------------------------------------------------------------
+    # Книги
+    # -------------------------------------------------------------------------
+
+    # Каталог книг с пагинацией и фильтрацией (CatalogPage, ManageBooksView)
+    load_books(pagination: BookPagination!, filter: BookFilter!): BooksConnection!
+
+    # Полные данные одной книги для чтения (ReaderPage)
+    read_book(book_id: ID!): Book!
+
+    # Подробности книги для формы редактирования (ManageBooksView → редактировать)
+    # Добавлен: нужен отдельно от read_book, т.к. включает служебные поля
+    # (isbn, edition_number, file_path, authorIds) которые не нужны читателю
+    get_book_details(book_id: ID!): Book!
+
+    # -------------------------------------------------------------------------
+    # Пользователи
+    # -------------------------------------------------------------------------
+
+    # Данные текущего авторизованного пользователя (ProfilePage, MainPage)
+    get_user(email: String!): User!
+
+    # Книги пользователя с прогрессом чтения (MyLibraryPage, MainPage — «Недавние»)
+    get_user_books(pagination: BookPagination!): UserBooksConnection!
+
+    # Список всех пользователей для администратора (ManageUsersView)
+    load_users(pagination: UserPagination!, filter: UserFilter!): UsersConnection!
+
+    # -------------------------------------------------------------------------
+    # Сотрудники
+    # Добавлен: ManageEmployeesView требует отдельный список сотрудников
+    # (JOIN EMPLOYEES + USERS + POSITIONS + WORK_SCHEDULES)
+    # -------------------------------------------------------------------------
+    load_employees(pagination: EmployeePagination!, filter: EmployeeFilter!): EmployeesConnection!
+
+    # -------------------------------------------------------------------------
+    # Справочники — нужны для заполнения чип-селекторов в форме загрузки книг
+    # -------------------------------------------------------------------------
+
+    # Список авторов для AutoChipsSelector в UploadBooksView / ManageBooksView
+    # Добавлен: AuthorChipsSelector.availableAuthors получает данные отсюда
+    load_authors(search: String): [Author!]!
+
+    # Список жанров для GenreChipsInput в UploadBooksView
+    # Добавлен: GenreChipsInput.availableGenres получает данные отсюда
+    load_genres: [Genre!]!
+
+    # Список языков для SingleChipSelector (langChip) в UploadBooksView
+    # Добавлен: langChip.availableItems маппится из этого ответа
+    load_languages: [Language!]!
+
+    # Список типов произведений для SingleChipSelector (typeChip) в UploadBooksView
+    # Добавлен: typeChip.availableItems маппится из этого ответа
+    load_types_of_work: [TypeOfWork!]!
+
+    # Список должностей для ManageEmployeesView (комбобокс должности)
+    # и ManageReferenceView (вкладка «Должности»)
+    # Добавлен: empPositionCombo и posModel получают данные отсюда
+    load_positions: [Position!]!
+
+    # -------------------------------------------------------------------------
+    # Справочники — уровни логов
+    # Добавлен: ManageReferenceView вкладка «Уровни логов» получает данные отсюда
+    # -------------------------------------------------------------------------
+    load_log_levels: [LevelOfLog!]!
+
+    # -------------------------------------------------------------------------
+    # Системные логи
+    # -------------------------------------------------------------------------
+    system_logs(pagination: LogPagination!, filter: LogFilter!): LogsConnection!
+}

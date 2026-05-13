@@ -1,0 +1,138 @@
+# =============================================================================
+# INPUT ТИПЫ для мутаций
+# =============================================================================
+
+# --- Авторизация -------------------------------------------------------------
+
+type AuthPayload {
+    access_token: String!
+    refresh_token: String!
+    user: User!
+}
+
+# --- Авторы ------------------------------------------------------------------
+
+input AuthorInput {
+    first_name: String!
+    last_name: String!
+    middle_name: String         
+    year_of_birth: Int!
+}
+
+# --- Книги -------------------------------------------------------------------
+
+input BookInput {
+    book_title: String!
+    description: String!        
+    isbn: String
+    year_of_publishing: Int!    
+    publisher: String!
+    number_of_pages: Int
+    language_id: ID             
+    language: LanguageInput     
+    type_of_work_id: ID         
+    type_of_work: TypeOfWorkInput  
+    genres: [String!]!         
+    author_ids: [ID!]!          
+    new_authors: [AuthorInput!]! 
+}
+
+# Поля для частичного обновления книги
+input BookInputForUpdate {
+    book_title: String
+    description: String
+    isbn: String
+    year_of_publishing: Int
+    publisher: String
+    number_of_pages: Int
+    language_id: ID
+    genres: [String!]
+    author_ids: [ID!]
+    new_authors: [AuthorInput!]
+}
+
+# --- Языки -------------------------------------------------------------------
+input LanguageInput {
+    language_name: String!
+    lang_code: String!          # напр. "ru", "en"
+}
+
+# --- Типы произведений -------------------------------------------------------
+input TypeOfWorkInput {
+    type_name: String!          # напр. "Роман", "Поэма"
+}
+
+# --- Медиафайлы --------------------------------------------------------------
+
+input MediaFileInput {
+    media_id: ID!
+    entity_type: String!
+    file_type: String!          # "cover" | "book_file"
+    file_name: String!
+    file_size: Int!
+    mime_type: String!
+    width: Int
+    height: Int
+    is_public: Boolean!
+    uploaded_by: ID!            
+    uploaded_at: DateTime!
+}
+
+# --- Пользователи ------------------------------------------------------------
+
+# Используется admin-мутацией update_user_information
+input UserInput {
+    first_name: String
+    last_name: String
+    email: String
+    phone: String               
+    new_password: String        ь
+}
+
+# --- Действия с библиотекой --------------------------------------------------
+
+input WorkWithBookInput {
+    user_id: ID!
+    book_id: ID!
+}
+
+input BookToRemove {
+    book_id: ID!
+}
+
+input UpdateUserBookInput {
+    book_id: ID!
+    current_page: Int!
+}
+
+# --- Сотрудники --------------------------------------------------------------
+input WorkScheduleInput {
+    work_days: Int!             # рабочих дней подряд (напр. 5 для 5/2)
+    holidays: Int!              # выходных подряд (напр. 2 для 5/2)
+    shift_start: String!        # "09:00"
+    shift_end: String!          # "18:00"
+}
+
+input EmployeeInput {
+    user_email: String!         # сотрудник должен существовать как User
+    position_id: ID!
+    hire_date: String!          # ISO дата "YYYY-MM-DD"
+    termination_date: String    # необязательно
+    passport_series: String!    # 4 цифры
+    passport_number: String!    # 6 цифр
+    phone: String
+    work_schedule: WorkScheduleInput!
+}
+
+# --- Справочники: уровни логов -----------------------------------------------
+input LogLevelInput {
+    level_name: String!         # "info", "warning", "error"
+    color: String!              # HEX-цвет, 
+}
+
+# --- Справочники: должности --------------------------------------------------
+input PositionInput {
+    title: String!              
+    salary: Float!              
+    permissions: [String!]!     
+}

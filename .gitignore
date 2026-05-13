@@ -1,0 +1,82 @@
+# ── .NET build output ─────────────────────────────────────────────────────────
+bin/
+obj/
+out/
+publish/
+*.user
+
+# ── Tests ─────────────────────────────────────────────────────────
+Server.Tests/
+
+# ── Visual Studio ─────────────────────────────────────────────────────────────
+.vs/
+*.suo
+*.userosscache
+*.sln.docview
+*.rsuser
+*.userprefs
+*.pidb
+*.orig
+*.rej
+
+# ── NuGet ─────────────────────────────────────────────────────────────────────
+packages/
+*.nupkg
+*.snupkg
+project.lock.json
+project.fragment.lock.json
+.nuget/
+
+# ── ASP.NET Core secrets ───────────────────────────────────────
+**/secrets.json
+appsettings.Development.json
+appsettings.Local.json
+appsettings.*.local.json
+.env
+.env.*
+launchSettings.json
+
+# ── IDE ───────────────────────────────────────────────────────────────────────
+.idea/
+*.sln.iml
+.vscode/
+*.orig
+
+# ── OS ────────────────────────────────────────────────────────────────────────
+Thumbs.db
+.DS_Store
+desktop.ini
+$RECYCLE.BIN/
+
+# ── Logs ──────────────────────────────────────────────────────────────────────
+*.log
+logs/
+*.log.*
+
+# ── Test results ──────────────────────────────────────────────────────────────
+TestResults/
+coverage/
+*.trx
+*.coveragexml
+
+# ── Claude Code / AI tooling ──────────────────────────────────────────────────
+.claude/
+CLAUDE.md
+CLAUDE.local.md
+*.claude
+memory/
+.cursorrules
+.aider*
+
+# ── Documentation─────────────────────────────────────────
+*.md
+!README.md
+
+# ── Render.com ────────────────────────────────────────────────────────────────
+.render/
+
+# ── Temp / misc ───────────────────────────────────────────────────────────────
+*.tmp
+*.bak
+*.swp
+~$*

@@ -1,0 +1,59 @@
+# Render.com Blueprint — defines the ELib backend web service.
+services:
+  - type: web
+    name: elib-server
+    runtime: docker
+    dockerfilePath: ./Server/Dockerfile
+    dockerContext: ./Server
+    healthCheckPath: /health
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+
+      # PostgreSQL (Supabase) — set value in Render Dashboard
+      - key: ConnectionStrings__Postgres
+        sync: false
+
+      # Yandex S3
+      - key: ConnectionStrings__YandexCloud__Endpoint
+        value: https://storage.yandexcloud.net
+      - key: ConnectionStrings__YandexCloud__Region
+        value: ru-central1-a
+      - key: ConnectionStrings__YandexCloud__Buckets__MainBucket
+        value: id-elibstorage
+      - key: ConnectionStrings__YandexCloud__Buckets__ElibLogging
+        value: id-eliblogs
+      - key: ConnectionStrings__YandexCloud__Buckets__PublicBaseUrl
+        value: https://storage.yandexcloud.net/id-elibstorage
+      - key: ConnectionStrings__YandexCloud__KeyIdentifier
+        sync: false
+      - key: ConnectionStrings__YandexCloud__SecretKey
+        sync: false
+
+      # SendSay email
+      - key: ConnectionStrings__SendSay__ApiUrl
+        value: https://api.sendsay.ru/general/api/v100/json/x_1776695759658519
+      - key: ConnectionStrings__SendSay__FromEmail
+        value: elib@elib.fun
+      - key: ConnectionStrings__SendSay__DraftsId__RecoveryPasswordId
+        value: "50"
+      - key: ConnectionStrings__SendSay__DraftsId__RegistrationSuccessId
+        value: "51"
+      - key: ConnectionStrings__SendSay__ApiKey
+        sync: false
+
+      # JWT
+      - key: ConnectionStrings__Jwt__Issuer
+        value: elib-server
+      - key: ConnectionStrings__Jwt__Audience
+        value: elib-client
+      - key: ConnectionStrings__Jwt__AccessTokenExpireMinutes
+        value: "60"
+      - key: ConnectionStrings__Jwt__RefreshTokenExpireDays
+        value: "30"
+      - key: ConnectionStrings__Jwt__SecretKey
+        sync: false
+
+      # Encryption
+      - key: ConnectionStrings__Security__EncryptionKey
+        sync: false

@@ -37,6 +37,7 @@ public class UserDto
     public DateTime LastLogin { get; set; }
     public DateTime LastPasswordChange { get; set; }
     public List<UserSessionDto> Sessions { get; set; } = new();
+    public int BooksCount { get; set; }
 }
 
 public class UserBookNestedBook

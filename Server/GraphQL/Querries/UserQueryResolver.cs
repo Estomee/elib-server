@@ -94,10 +94,17 @@ public class UserQueryResolver
         var hasExtra = users.Count > pageSize;
         if (hasExtra) users.RemoveAt(isBackward ? 0 : users.Count - 1);
 
+        var userIds = users.Select(u => u.UserId).ToList();
+        var bookCounts = await db.UserBooks
+            .Where(ub => userIds.Contains(ub.UserId))
+            .GroupBy(ub => ub.UserId)
+            .Select(g => new { UserId = g.Key, Count = g.Count() })
+            .ToDictionaryAsync(x => x.UserId, x => x.Count, cancellationToken);
+
         var edges = users.Select(u => new UserEdge
         {
             Cursor = EncodeCursor(u.UserId),
-            Node   = AuthService.MapUser(u)
+            Node   = AuthService.MapUser(u) with { BooksCount = bookCounts.GetValueOrDefault(u.UserId, 0) }
         }).ToList();
 
         return new UsersConnection

@@ -101,10 +101,11 @@ public class UserQueryResolver
             .Select(g => new { UserId = g.Key, Count = g.Count() })
             .ToDictionaryAsync(x => x.UserId, x => x.Count, cancellationToken);
 
-        var edges = users.Select(u => new UserEdge
+        var edges = users.Select(u =>
         {
-            Cursor = EncodeCursor(u.UserId),
-            Node   = AuthService.MapUser(u) with { BooksCount = bookCounts.GetValueOrDefault(u.UserId, 0) }
+            var dto = AuthService.MapUser(u);
+            dto.BooksCount = bookCounts.GetValueOrDefault(u.UserId, 0);
+            return new UserEdge { Cursor = EncodeCursor(u.UserId), Node = dto };
         }).ToList();
 
         return new UsersConnection
